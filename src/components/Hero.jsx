@@ -19,11 +19,15 @@ const Hero = () => {
             </div>
             
             <h1 className="font-headline-xl-mobile text-headline-xl-mobile md:font-headline-xl md:text-headline-xl text-primary font-extrabold tracking-tight leading-tight">
-              Grow Your Business With <span className="text-secondary-container">Digital Marketing</span>
+              #1 <span className="text-secondary-container">Digital Marketing Agency in Vadodara</span> — Grow Your Business
             </h1>
             
+            <h2 className="font-title-lg text-title-lg md:font-headline-sm md:text-headline-sm text-on-surface-variant font-semibold tracking-tight">
+              Best Digital Marketing Agency in Vadodara for SEO, Google Ads &amp; Social Media
+            </h2>
+            
             <p className="font-body-md text-body-md md:font-body-lg md:text-body-lg text-on-surface-variant leading-relaxed max-w-2xl">
-              We help businesses increase their online visibility, generate qualified leads, and grow through SEO, Google Ads, Meta Ads, Social Media Marketing, and high-performing websites.
+              As the leading <strong>digital marketing agency in Vadodara</strong>, we help businesses increase their online visibility and generate qualified leads. Our expert team specializes in <strong>SEO in Vadodara</strong>, Google Ads, Meta Ads, Social Media Marketing, and high-performing websites — making us the <strong>best digital marketing agency in Vadodara</strong> for real, measurable growth.
             </p>
             
             <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-space-md pt-space-xs">
