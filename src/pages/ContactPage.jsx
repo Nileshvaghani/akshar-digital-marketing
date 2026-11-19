@@ -1,376 +1,504 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 const ContactPage = () => {
-  const [showFeedback, setShowFeedback] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    company: '',
+    service: 'seo-services',
+    message: '',
+    botField: '' // Honeypot field for spam prevention
+  });
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setShowFeedback(true);
-    event.target.reset();
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedData, setSubmittedData] = useState(null);
+
+  const contactSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    'name': 'Contact Akshar Digital Marketing',
+    'description': 'Get in touch with Akshar Digital Marketing for high-ROI digital marketing strategies, SEO, PPC advertising, and social media management.',
+    'url': 'https://akshardigitalmarketing.com/contact/',
+    'mainEntity': {
+      '@type': 'ProfessionalService',
+      'name': 'Akshar Digital Marketing',
+      'telephone': '+918758835700',
+      'email': 'hello@akshardigitalmarketing.com',
+      'address': {
+        '@type': 'PostalAddress',
+        'addressLocality': 'Vadodara',
+        'addressRegion': 'Gujarat',
+        'addressCountry': 'IN'
+      }
+    }
+  };
+
+  const validate = () => {
+    const errs = {};
+    if (!formData.fullName.trim() || formData.fullName.trim().length < 2) {
+      errs.fullName = 'Please enter your full name (at least 2 characters).';
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim() || !emailRegex.test(formData.email.trim())) {
+      errs.email = 'Please enter a valid email address.';
+    }
+
+    const phoneRegex = /^[\d\s+()-]{7,20}$/;
+    if (!formData.phone.trim() || !phoneRegex.test(formData.phone.trim())) {
+      errs.phone = 'Please enter a valid phone number with country/area code.';
+    }
+
+    if (!formData.message.trim() || formData.message.trim().length < 10) {
+      errs.message = 'Please provide a message with at least 10 characters detailing your request.';
+    }
+
+    return errs;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Honeypot spam protection: if botField has any value, silently stop
+    if (formData.botField) {
+      console.warn('Spam submission detected and blocked.');
+      return;
+    }
+
+    const formErrors = validate();
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Simulate reliable API submission with smooth feedback
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      setSubmittedData({ ...formData });
+      setFormData({
+        fullName: '',
+        email: '',
+        phone: '',
+        company: '',
+        service: 'seo-services',
+        message: '',
+        botField: ''
+      });
+      setErrors({});
+    }, 600);
   };
 
   return (
     <>
-      <section className="relative w-full bg-primary-container text-on-primary py-space-2xl overflow-hidden">
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <radialGradient cx="50%" cy="0%" id="grid-glow" r="70%">
-                <stop offset="0%" stopColor="#fd761a" stopOpacity="0.4"></stop>
-                <stop offset="100%" stopColor="#0b2345" stopOpacity="0"></stop>
-              </radialGradient>
-            </defs>
-            <rect fill="url(#grid-glow)" height="100" width="100"></rect>
-            <path d="M0 20 H100 M0 40 H100 M0 60 H100 M0 80 H100" stroke="#d7e3ff" strokeDasharray="1 2" strokeWidth="0.05"></path>
-            <path d="M20 0 V100 M40 0 V100 M60 0 V100 M80 0 V100" stroke="#d7e3ff" strokeDasharray="1 2" strokeWidth="0.05"></path>
-          </svg>
-        </div>
-        <div className="relative max-w-7xl mx-auto px-gutter flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container/10 border-0 mb-space-md backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-secondary-container animate-ping"></span>
-            <span className="font-label-md text-label-md text-secondary-container tracking-widest uppercase font-bold">GET IN TOUCH</span>
+      <SEO
+        title="Contact Us | Akshar Digital Marketing — Get Free Consultation"
+        description="Contact Akshar Digital Marketing for a free consultation. Discover tailored SEO, PPC, and digital marketing strategies for your business in India, US, UK, Canada, and Australia."
+        keywords="contact Akshar Digital Marketing, free digital marketing consultation, hire SEO agency, PPC agency Vadodara, international digital marketing"
+        canonical="https://akshardigitalmarketing.com/contact/"
+        schema={contactSchema}
+      />
+
+      {/* Header */}
+      <section className="bg-white pt-10 pb-16 md:py-20 border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <nav className="flex items-center gap-2 text-xs text-slate-500 mb-6" aria-label="Breadcrumb">
+            <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-blue-600 font-medium">Contact Us</span>
+          </nav>
+
+          <div className="max-w-3xl">
+            <span className="text-xs font-bold tracking-widest uppercase text-blue-600 bg-blue-50 border border-blue-100 px-3.5 py-1.5 rounded-full inline-block mb-4">
+              LET'S START A CONVERSATION
+            </span>
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-[#0B2345] tracking-tight leading-tight">
+              Get in Touch for a Free Consultation
+            </h1>
+            <p className="mt-4 text-lg text-slate-600 leading-relaxed">
+              Have questions about your digital marketing or ready to scale your business? Share your details below and our team will get back to you within 24 hours.
+            </p>
           </div>
-          <h1 className="font-headline-xl text-headline-xl text-on-primary max-w-4xl tracking-tight leading-tight">
-            Let's Discuss Your Next Phase of <span className="text-secondary-container">Digital Growth</span>
-          </h1>
-          <p className="font-body-lg text-body-lg text-surface-container-highest max-w-2xl mt-space-md leading-relaxed">
-            Whether you need a full digital audit, high-performance ad management, or SEO that dominates your market, we are ready to build your growth engine.
-          </p>
-          <div className="mt-space-lg flex flex-wrap items-center justify-center gap-space-md text-surface-container-high font-label-md text-label-md">
-            <span className="inline-flex items-center gap-1.5 bg-primary/40 px-3 py-1.5 rounded-full">
-              <span className="material-symbols-outlined text-[18px] text-tertiary-fixed">verified</span>
-              Vadodara HQ &amp; Global Execution
-            </span>
-            <span className="inline-flex items-center gap-1.5 bg-primary/40 px-3 py-1.5 rounded-full">
-              <span className="material-symbols-outlined text-[18px] text-tertiary-fixed">bolt</span>
-              2-Hour SLA Response
-            </span>
-            <span className="inline-flex items-center gap-1.5 bg-primary/40 px-3 py-1.5 rounded-full">
-              <span className="material-symbols-outlined text-[18px] text-tertiary-fixed">account_circle</span>
-              Founder-Led Strategy
-            </span>
-          </div>
+
         </div>
       </section>
-      
-      <section className="w-full bg-background py-space-2xl">
-        <div className="max-w-7xl mx-auto px-gutter">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
-            <div className="lg:col-span-5 flex flex-col gap-space-lg">
-              <div className="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm">
-                <div className="flex items-center justify-between gap-space-md mb-space-md">
-                  <span className="font-label-md text-label-md text-secondary-container font-bold uppercase tracking-wider">Direct Access</span>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-low text-on-tertiary-container font-label-md text-label-md font-semibold">
-                    <span className="w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"></span> Available Today
-                  </span>
-                </div>
-                <h2 className="font-headline-md text-headline-md text-primary-container leading-tight mb-space-sm">
-                  Speak Directly with Senior Leadership
-                </h2>
-                <p className="font-body-md text-body-md text-on-surface-variant mb-space-lg">
-                  No sales intermediaries. Your initial consultation and revenue audit are evaluated directly by Nilesh Vaghani and key growth architects.
-                </p>
-                <div className="flex flex-col gap-space-md">
-                  <div className="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-low/70 hover:bg-surface-container-low transition-colors">
-                    <div className="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary-container shrink-0 shadow-sm">
-                      <span className="material-symbols-outlined text-[22px]">location_on</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-label-lg text-label-lg font-bold text-primary-container">Office Address</span>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-snug">
-                        Akshar Digital Marketing<br/>
-                        Alkapuri / RC Dutt Road Commercial Hub,<br/>
-                        Vadodara, Gujarat 390007, India
-                      </p>
-                    </div>
+
+      {/* Contact Form & Business Details */}
+      <section className="py-20 bg-slate-50 border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            
+            {/* Left: Interactive & Validated Contact Form */}
+            <div className="lg:col-span-7 bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-sm">
+              
+              {isSubmitted ? (
+                <div className="py-8 text-center flex flex-col items-center">
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-6">
+                    <span className="material-symbols-outlined text-[36px]">check_circle</span>
                   </div>
-                  <div className="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-low/70 hover:bg-surface-container-low transition-colors">
-                    <div className="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-on-tertiary-container shrink-0 shadow-sm">
-                      <span className="material-symbols-outlined text-[22px]">chat</span>
-                    </div>
-                    <div className="flex flex-col flex-grow">
-                      <span className="font-label-lg text-label-lg font-bold text-primary-container">WhatsApp &amp; Direct Phone</span>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Quick consultation via phone or instant WhatsApp desk.</p>
-                      <div className="mt-space-sm flex flex-wrap gap-space-xs">
-                        <a className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-on-primary-container font-label-md text-label-md font-semibold hover:bg-surface-container-highest transition-colors" href="https://wa.me/918758835700" rel="noopener noreferrer" target="_blank">
-                          <span className="material-symbols-outlined text-[16px] text-on-tertiary-container">forum</span> WhatsApp (+91 87588 35700)
-                        </a>
-                        <a className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-on-primary-container font-label-md text-label-md font-semibold hover:bg-surface-container-highest transition-colors" href="tel:+918758835700">
-                          <span className="material-symbols-outlined text-[16px] text-primary-container">call</span> Direct Line
-                        </a>
-                      </div>
-                    </div>
+                  <h2 className="text-2xl font-bold text-[#0B2345] mb-2">
+                    Thank You, {submittedData?.fullName}!
+                  </h2>
+                  <p className="text-slate-600 text-base max-w-md mx-auto mb-6 leading-relaxed">
+                    Your inquiry has been successfully received. We will review your website and requirements and reach out within 24 business hours.
+                  </p>
+                  
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left w-full max-w-md mb-6 text-xs text-slate-600 space-y-1.5">
+                    <div><strong className="text-slate-800">Email:</strong> {submittedData?.email}</div>
+                    <div><strong className="text-slate-800">Phone:</strong> {submittedData?.phone}</div>
+                    <div><strong className="text-slate-800">Service:</strong> {submittedData?.service}</div>
                   </div>
-                  <div className="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-low/70 hover:bg-surface-container-low transition-colors">
-                    <div className="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-secondary-container shrink-0 shadow-sm">
-                      <span className="material-symbols-outlined text-[22px]">mail</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-label-lg text-label-lg font-bold text-primary-container">Email Inquiries</span>
-                      <a className="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary-container transition-colors mt-0.5" href="mailto:hello@akshardigital.com">hello@akshardigital.com</a>
-                      <a className="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary-container transition-colors" href="mailto:nilesh@akshardigital.com">nilesh@akshardigital.com</a>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-low/70 hover:bg-surface-container-low transition-colors">
-                    <div className="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary-container shrink-0 shadow-sm">
-                      <span className="material-symbols-outlined text-[22px]">schedule</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-label-lg text-label-lg font-bold text-primary-container">Operating Desk Hours</span>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Monday – Saturday: 9:30 AM – 7:00 PM IST</p>
-                      <span className="font-label-md text-label-md text-on-surface-variant/80">Sunday: Closed for Strategic Account Audits</span>
-                    </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsSubmitted(false)}
+                      className="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition-colors"
+                    >
+                      Send Another Message
+                    </button>
+                    <a
+                      href="https://wa.me/918758835700"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">chat</span>
+                      <span>Chat on WhatsApp</span>
+                    </a>
                   </div>
                 </div>
-                <div className="mt-space-lg p-space-md rounded-xl bg-surface-container text-on-primary-container flex items-center gap-space-md">
-                  <span className="material-symbols-outlined text-[28px] text-secondary-container shrink-0">speed</span>
-                  <div className="flex flex-col">
-                    <span className="font-label-md text-label-md font-bold text-primary-container">Strict 2-Hour Response SLA</span>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant leading-snug">All verified website form inquiries receive tactical preliminary feedback within two working hours.</p>
+              ) : (
+                <form onSubmit={handleSubmit} noValidate>
+                  <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-[#0B2345]">
+                      Send Us a Message
+                    </h2>
+                    <p className="text-sm text-slate-600 mt-1">
+                      Fill out the form and we'll prepare strategic insights for your business.
+                    </p>
                   </div>
-                </div>
-              </div>
-              <div className="bg-surface-container-lowest rounded-2xl overflow-hidden p-space-md shadow-sm">
-                <div className="flex items-center justify-between mb-space-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-secondary-container text-[20px]">explore</span>
-                    <span className="font-label-lg text-label-lg font-bold text-primary-container">Vadodara Technology Center</span>
+
+                  {/* Honeypot Spam Protection Field (hidden from genuine users) */}
+                  <div className="hidden" aria-hidden="true">
+                    <label htmlFor="botField">Leave this field blank</label>
+                    <input
+                      type="text"
+                      id="botField"
+                      name="botField"
+                      value={formData.botField}
+                      onChange={handleChange}
+                      tabIndex={-1}
+                      autoComplete="off"
+                    />
                   </div>
-                  <span className="font-label-md text-label-md text-on-surface-variant">RC Dutt Road Area</span>
-                </div>
-                <div className="w-full h-56 bg-cover bg-center rounded-xl relative overflow-hidden flex items-end p-space-md" data-alt="Stylized top down satellite map visual of Vadodara Alkapuri RC Dutt Road commercial corridor highlighting modern corporate towers and digital agency presence with clean blue and slate tones" data-location="Alkapuri, Vadodara, Gujarat, India" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuChuZFZreNXfP80O50qwv2pAqDugAM1zyyt8akcep6ybJFfCOVfafFSYAc4gxRB-w_LUMn4zjLPvFyWBHd3w6ygd5FYYO8lo_RbgmmCXiZuIKEJbhNmpRzwN5kN29ZJvxozP4mU68CJH6CLU9AiAQCEJJ1YJS6Bl19tOCRJRgUoV6DYUTkJ0hG4nsRz5JFGogLgkjaLg8CaYwzwnE2rSluGInXCT8zFGjzGIm2jXqUhSTdMANKJDnxOZQ')" }}>
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary-container/90 via-primary-container/30 to-transparent"></div>
-                  <div className="relative z-10 flex items-center justify-between w-full">
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                    {/* Full Name */}
                     <div>
-                      <span className="font-label-lg text-label-lg font-bold text-on-primary block">Akshar Headquarters</span>
-                      <span className="font-body-sm text-body-sm text-surface-container-highest">In-Person &amp; Remote Client Consultations</span>
+                      <label htmlFor="fullName" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                        Full Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="fullName"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleChange}
+                        placeholder="e.g. John Doe"
+                        className={`w-full px-4 py-3 rounded-xl border text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                          errors.fullName
+                            ? 'border-red-400 focus:ring-red-200'
+                            : 'border-slate-200 focus:border-blue-500 focus:ring-blue-100'
+                        }`}
+                      />
+                      {errors.fullName && (
+                        <p className="text-xs text-red-500 mt-1.5">{errors.fullName}</p>
+                      )}
                     </div>
-                    <a className="px-3 py-1.5 rounded-lg bg-surface-container-lowest text-primary-container font-label-md text-label-md font-semibold shadow-sm hover:bg-surface-container transition-colors" href="https://maps.google.com/?q=Alkapuri+Vadodara+Gujarat" rel="noopener noreferrer" target="_blank">
-                      Open Map
+
+                    {/* Email Address */}
+                    <div>
+                      <label htmlFor="email" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                        Email Address <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="e.g. john@company.com"
+                        className={`w-full px-4 py-3 rounded-xl border text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                          errors.email
+                            ? 'border-red-400 focus:ring-red-200'
+                            : 'border-slate-200 focus:border-blue-500 focus:ring-blue-100'
+                        }`}
+                      />
+                      {errors.email && (
+                        <p className="text-xs text-red-500 mt-1.5">{errors.email}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                    {/* Phone Number */}
+                    <div>
+                      <label htmlFor="phone" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                        Phone Number <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        placeholder="e.g. +1 (555) 000-0000"
+                        className={`w-full px-4 py-3 rounded-xl border text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                          errors.phone
+                            ? 'border-red-400 focus:ring-red-200'
+                            : 'border-slate-200 focus:border-blue-500 focus:ring-blue-100'
+                        }`}
+                      />
+                      {errors.phone && (
+                        <p className="text-xs text-red-500 mt-1.5">{errors.phone}</p>
+                      )}
+                    </div>
+
+                    {/* Company / Website */}
+                    <div>
+                      <label htmlFor="company" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                        Company / Website
+                      </label>
+                      <input
+                        type="text"
+                        id="company"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleChange}
+                        placeholder="e.g. www.yourcompany.com"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Required Service Dropdown */}
+                  <div className="mb-6">
+                    <label htmlFor="service" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                      Required Service <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="service"
+                      name="service"
+                      value={formData.service}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white"
+                    >
+                      <option value="seo-services">SEO Services (Search Engine Optimization)</option>
+                      <option value="ppc-advertising">PPC Advertising (Google Ads Management)</option>
+                      <option value="social-media-management">Social Media Management</option>
+                      <option value="meta-ads-management">Meta Ads Management (Facebook, Instagram & WhatsApp)</option>
+                      <option value="graphic-design">Graphic Design Services</option>
+                      <option value="video-editing">Video Editing Services</option>
+                      <option value="comprehensive-strategy">Comprehensive Growth Strategy (Multiple Services)</option>
+                    </select>
+                  </div>
+
+                  {/* Message Field */}
+                  <div className="mb-8">
+                    <label htmlFor="message" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                      Your Message / Goals <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      rows="5"
+                      value={formData.message}
+                      onChange={handleChange}
+                      placeholder="Briefly describe your business, primary goals, and target audience..."
+                      className={`w-full px-4 py-3 rounded-xl border text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                        errors.message
+                          ? 'border-red-400 focus:ring-red-200'
+                          : 'border-slate-200 focus:border-blue-500 focus:ring-blue-100'
+                      }`}
+                    ></textarea>
+                    {errors.message && (
+                      <p className="text-xs text-red-500 mt-1.5">{errors.message}</p>
+                    )}
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold text-base shadow-sm hover:shadow-md transition-all"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        <span>Submitting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Submit Inquiry</span>
+                        <span className="material-symbols-outlined text-[18px]">send</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+
+            </div>
+
+            {/* Right: Business Details & Social Links */}
+            <div className="lg:col-span-5 flex flex-col gap-6">
+              
+              {/* Direct Contact Card */}
+              <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm">
+                <h2 className="text-xl font-bold text-[#0B2345] mb-6">
+                  Agency Contact Details
+                </h2>
+
+                <div className="space-y-6 text-sm">
+                  {/* Location */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="material-symbols-outlined text-[20px]">location_on</span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[#0B2345]">Headquarters</h3>
+                      <p className="text-slate-600 mt-0.5">Vadodara, Gujarat, India</p>
+                      <p className="text-xs text-blue-600 mt-0.5 font-medium">Serving Clients Globally (India, US, UK, Canada, Australia)</p>
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="material-symbols-outlined text-[20px]">call</span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[#0B2345]">Phone & WhatsApp</h3>
+                      <a href="tel:+918758835700" className="text-slate-600 hover:text-blue-600 transition-colors block mt-0.5">
+                        +91 87588 35700
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="material-symbols-outlined text-[20px]">mail</span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[#0B2345]">Email Address</h3>
+                      <a href="mailto:hello@akshardigitalmarketing.com" className="text-slate-600 hover:text-blue-600 transition-colors block mt-0.5">
+                        hello@akshardigitalmarketing.com
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Founder */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="material-symbols-outlined text-[20px]">person</span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[#0B2345]">Founder & Strategist</h3>
+                      <p className="text-slate-600 mt-0.5">Nilesh Vaghani</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Social Media Links */}
+                <div className="mt-8 pt-6 border-t border-slate-100">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+                    Connect on Social
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <a
+                      href="https://www.facebook.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 flex items-center justify-center transition-colors"
+                      aria-label="Facebook"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95C18.05 21.45 22 17.19 22 12z"/></svg>
+                    </a>
+                    <a
+                      href="https://www.instagram.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-pink-600 hover:text-white text-slate-700 flex items-center justify-center transition-colors"
+                      aria-label="Instagram"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    </a>
+                    <a
+                      href="https://www.linkedin.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-blue-700 hover:text-white text-slate-700 flex items-center justify-center transition-colors"
+                      aria-label="LinkedIn"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                    </a>
+                    <a
+                      href="https://wa.me/918758835700"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition-colors"
+                      aria-label="WhatsApp"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">chat</span>
                     </a>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="lg:col-span-7">
-              <div className="bg-surface-container-lowest rounded-2xl p-space-xl shadow-md relative">
-                <div className="mb-space-lg">
-                  <div className="inline-block px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md font-bold mb-space-xs">
-                    STRATEGY BOOKING
+
+              {/* What Happens Next Card */}
+              <div className="bg-blue-50/60 rounded-3xl p-8 border border-blue-100">
+                <h3 className="text-base font-bold text-[#0B2345] mb-4">
+                  What Happens Next?
+                </h3>
+                <div className="space-y-4 text-xs text-slate-600">
+                  <div className="flex items-start gap-3">
+                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shrink-0 mt-0.5">1</span>
+                    <p><strong className="text-slate-800">Initial Review:</strong> We analyze your website and current marketing presence.</p>
                   </div>
-                  <h2 className="font-headline-lg text-headline-lg text-primary-container tracking-tight leading-tight">
-                    Request Your In-Depth Growth Audit
-                  </h2>
-                  <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-                    Fill in your brand credentials. Nilesh Vaghani and our PPC/SEO leads will analyze your website and competitors prior to your call.
-                  </p>
+                  <div className="flex items-start gap-3">
+                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shrink-0 mt-0.5">2</span>
+                    <p><strong className="text-slate-800">Discovery Discussion:</strong> A concise 30-minute call to discuss your objectives.</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shrink-0 mt-0.5">3</span>
+                    <p><strong className="text-slate-800">Tailored Roadmap:</strong> A clear strategy proposal with recommended channels and timeline.</p>
+                  </div>
                 </div>
-                <form className="flex flex-col gap-space-md" id="growth-contact-form" onSubmit={handleSubmit}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="font-label-lg text-label-lg font-semibold text-primary-container" htmlFor="fullName">
-                        Full Name <span className="text-secondary">*</span>
-                      </label>
-                      <input className="w-full px-4 py-3 rounded-lg bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-md text-body-md shadow-sm outline-none focus:bg-surface-container-low transition-all" id="fullName" placeholder="e.g. Ramesh Patel" required type="text"/>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="font-label-lg text-label-lg font-semibold text-primary-container" htmlFor="workEmail">
-                        Work Email <span className="text-secondary">*</span>
-                      </label>
-                      <input className="w-full px-4 py-3 rounded-lg bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-md text-body-md shadow-sm outline-none focus:bg-surface-container-low transition-all" id="workEmail" placeholder="name@company.com" required type="email"/>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="font-label-lg text-label-lg font-semibold text-primary-container" htmlFor="phone">
-                        Phone / WhatsApp Number <span className="text-secondary">*</span>
-                      </label>
-                      <div className="flex items-center w-full rounded-lg bg-surface-container-lowest shadow-sm overflow-hidden focus-within:bg-surface-container-low transition-all">
-                        <span className="px-3 py-3 bg-surface-container text-on-primary-container font-label-md text-label-md font-bold">+91</span>
-                        <input className="w-full px-3 py-3 bg-transparent text-on-surface placeholder:text-outline font-body-md text-body-md outline-none" id="phone" placeholder="98765 43210" required type="tel"/>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="font-label-lg text-label-lg font-semibold text-primary-container" htmlFor="websiteUrl">
-                        Website or Brand URL <span className="text-secondary">*</span>
-                      </label>
-                      <input className="w-full px-4 py-3 rounded-lg bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-md text-body-md shadow-sm outline-none focus:bg-surface-container-low transition-all" id="websiteUrl" placeholder="https://yourbrand.com" required type="url"/>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="font-label-lg text-label-lg font-semibold text-primary-container" htmlFor="budgetRange">
-                        Monthly Marketing Budget
-                      </label>
-                      <select className="w-full px-4 py-3 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm outline-none focus:bg-surface-container-low transition-all cursor-pointer" id="budgetRange">
-                        <option value="">Select realistic ad/retainer bracket</option>
-                        <option value="starter">₹35,000 – ₹75,000 / month</option>
-                        <option value="growth">₹75,000 – ₹2,00,000 / month</option>
-                        <option value="scale">₹2,00,000 – ₹5,00,000 / month</option>
-                        <option value="enterprise">₹5,00,000+ / month (Enterprise)</option>
-                      </select>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="font-label-lg text-label-lg font-semibold text-primary-container" htmlFor="primaryService">
-                        Primary Service Needed <span className="text-secondary">*</span>
-                      </label>
-                      <select className="w-full px-4 py-3 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm outline-none focus:bg-surface-container-low transition-all cursor-pointer" id="primaryService" required>
-                        <option value="">Choose growth domain</option>
-                        <option value="seo">High-Impact Search Engine Optimization (SEO)</option>
-                        <option value="google_ads">Google Ads &amp; Intent PPC Management</option>
-                        <option value="meta_ads">Meta, Instagram &amp; WhatsApp Performance Ads</option>
-                        <option value="wordpress">High-Converting WordPress Development</option>
-                        <option value="full_stack">Full 360° Akshar Digital Growth Stack</option>
-                        <option value="audit">Standalone Digital Architecture Audit</option>
-                      </select>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-label-lg text-label-lg font-semibold text-primary-container" htmlFor="growthGoal">
-                      Tell us about your primary growth goal or current pain points
-                    </label>
-                    <textarea className="w-full p-4 rounded-lg bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-md text-body-md shadow-sm outline-none focus:bg-surface-container-low transition-all" id="growthGoal" placeholder="e.g. We are generating leads on Meta Ads but acquisition cost is too high; our organic rankings stalled after Google updates..." rows="4"></textarea>
-                  </div>
-                  
-                  <div className="flex items-center gap-space-sm p-space-sm rounded-lg bg-surface-container-low">
-                    <input className="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" id="ndaCheck" type="checkbox"/>
-                    <label className="font-body-sm text-body-sm text-on-surface-variant cursor-pointer select-none" htmlFor="ndaCheck">
-                      Request an NDA prior to disclosing proprietary business or analytics credentials.
-                    </label>
-                  </div>
-                  
-                  <div className="pt-space-xs flex flex-col gap-space-sm">
-                    <button className="w-full py-4 px-space-lg rounded-lg bg-secondary-container text-on-primary font-headline-sm text-headline-sm font-bold shadow-md hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-space-sm cursor-pointer" type="submit">
-                      <span>Claim My Free Strategy Session</span>
-                      <span className="material-symbols-outlined text-[24px]">arrow_forward</span>
-                    </button>
-                    <div className="flex items-center justify-center gap-2 text-on-surface-variant font-label-md text-label-md text-center">
-                      <span className="material-symbols-outlined text-[16px] text-on-tertiary-container">lock</span>
-                      <span>100% Privacy guaranteed. Zero spam or high-pressure sales calls.</span>
-                    </div>
-                  </div>
-                  
-                  {showFeedback && (
-                    <div className="p-space-md rounded-xl bg-tertiary-container text-on-tertiary flex items-center gap-space-md animate-fade-in" id="form-feedback">
-                      <span className="material-symbols-outlined text-[28px] text-tertiary-fixed">check_circle</span>
-                      <div className="flex flex-col">
-                        <span className="font-label-lg text-label-lg font-bold text-tertiary-fixed">Inquiry Received Successfully</span>
-                        <span className="font-body-sm text-body-sm text-surface-variant">Nilesh Vaghani's strategy team will review your portal and respond within 2 hours.</span>
-                      </div>
-                    </div>
-                  )}
-                </form>
               </div>
+
             </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* FAQ Section */}
-      <section className="w-full bg-surface-container-low py-space-2xl">
-        <div className="max-w-7xl mx-auto px-gutter">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-xl">
-            <div>
-              <span className="font-label-md text-label-md text-secondary-container font-bold uppercase tracking-widest block mb-1">
-                CLARITY &amp; PROCEDURES
-              </span>
-              <h2 className="font-headline-lg text-headline-lg text-primary-container tracking-tight">
-                Frequently Asked Questions
-              </h2>
-            </div>
-            <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
-              Transparent insights into our operational model, service engagements, and results tracking before we begin.
-            </p>
-          </div>
-          <FaqAccordion />
-        </div>
-      </section>
-      
-      {/* Bottom CTA Section */}
-      <section className="w-full bg-primary-container py-space-xl text-on-primary">
-        <div className="max-w-7xl mx-auto px-gutter flex flex-col md:flex-row items-center justify-between gap-space-lg">
-          <div className="flex items-center gap-space-md text-left">
-            <div className="w-14 h-14 rounded-2xl bg-surface-container/10 flex items-center justify-center text-secondary-container shrink-0">
-              <span className="material-symbols-outlined text-[32px]">headset_mic</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-headline-sm text-headline-sm font-bold text-on-primary">Need an immediate answer right now?</span>
-              <span className="font-body-sm text-body-sm text-surface-container-highest">Our communications desk is active. Jump directly onto a call or chat.</span>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-space-md shrink-0">
-            <a className="px-space-lg py-3 rounded-lg bg-surface-container/20 text-on-primary hover:bg-surface-container/30 font-label-lg text-label-lg font-bold flex items-center gap-space-xs transition-colors" href="tel:+918758835700">
-              <span className="material-symbols-outlined text-[20px] text-secondary-container">call</span>
-              <span>Call: +91 87588 35700</span>
-            </a>
-            <a className="px-space-lg py-3 rounded-lg bg-secondary-container text-on-primary hover:opacity-95 font-label-lg text-label-lg font-bold shadow-md flex items-center gap-space-xs transition-all" href="https://wa.me/918758835700" rel="noopener noreferrer" target="_blank">
-              <span className="material-symbols-outlined text-[20px]">chat</span>
-              <span>Instant WhatsApp Message</span>
-            </a>
+
           </div>
         </div>
       </section>
     </>
-  );
-};
-
-// Extracted FAQ Component to handle state properly in React
-const FaqAccordion = () => {
-  const [openIndex, setOpenIndex] = useState(null);
-
-  const faqs = [
-    {
-      question: "1. How quickly can we expect measurable results from SEO vs PPC?",
-      answer: "With paid acquisition (Google Search Ads, Meta Performance Campaigns), qualified inbound lead pipelines usually generate within the first 72 to 96 hours following tracking pixel stabilization and conversion setup. For organic SEO, technical fixes and speed gains are visible within 3 weeks, while aggressive page-one keyword visibility and authority acquisition hit compounding momentum between 60 to 90 days."
-    },
-    {
-      question: "2. Do I work directly with Nilesh Vaghani or an account manager?",
-      answer: "Unlike massive generic agencies where clients are handed off to junior interns, Nilesh personally leads the core architecture of your digital campaign, keyword mapping, ad copy scrutiny, and bi-weekly strategic sprint calls. You also have direct real-time communication access through a dedicated senior technical specialist."
-    },
-    {
-      question: "3. What is the minimum contract or commitment duration?",
-      answer: "We believe client retention must be earned through verified ROI, not binding lock-in clauses. Paid advertising sprints operate on rolling 30-day arrangements with 15 days notice. Full SEO engagements require a standard 90-day execution framework simply because organic indexation algorithms demand that timeframe to reward white-hat content and link signals."
-    },
-    {
-      question: "4. Do you work with businesses outside of Vadodara / Gujarat?",
-      answer: "Yes. While our physical headquarters is rooted in Vadodara's commercial center, more than 60% of our portfolio comprises enterprise manufacturers, D2C brands, healthcare networks, and software companies across Mumbai, Bangalore, the National Capital Region (NCR), Dubai, and North America."
-    },
-    {
-      question: "5. What does the complimentary 30-minute growth audit include?",
-      answer: "The free 30-minute growth session is a structured, screen-shared performance diagnosis. It includes: (1) An organic competitor teardown highlighting missed commercial search queries, (2) An ad spend bleed check evaluating your current Meta and Google targeting wastage, and (3) A UX conversion benchmark identifying where mobile visitors are abandoning your funnel."
-    }
-  ];
-
-  return (
-    <div className="flex flex-col gap-space-md max-w-4xl mx-auto" id="faq-accordion-group">
-      {faqs.map((faq, index) => {
-        const isOpen = openIndex === index;
-        return (
-          <div key={index} className="faq-card bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden transition-all duration-300">
-            <button 
-              className="faq-toggle w-full p-space-lg text-left flex items-center justify-between gap-space-md cursor-pointer select-none" 
-              onClick={() => setOpenIndex(isOpen ? null : index)}
-              type="button"
-            >
-              <span className="font-title-lg text-title-lg text-primary-container font-bold">
-                {faq.question}
-              </span>
-              <span className={`faq-icon material-symbols-outlined text-secondary-container text-[24px] transform transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-45' : ''}`}>
-                {isOpen ? 'cancel' : 'add_circle'}
-              </span>
-            </button>
-            <div className={`faq-content px-space-lg pb-space-lg pt-0 text-on-surface-variant font-body-md text-body-md leading-relaxed ${isOpen ? 'block' : 'hidden'}`}>
-              {faq.answer}
-            </div>
-          </div>
-        );
-      })}
-    </div>
   );
 };
 
